@@ -112,18 +112,42 @@
     "clients": [
       {
         "clientId": "reports-frontend",
+        "name": "BionicPRO Reports Frontend",
+        "description": "Веб-приложение для просмотра отчетов использования протезов с PKCE",
         "enabled": true,
         "publicClient": true,
-        "redirectUris": ["http://localhost:3000/*"],
+        "protocol": "openid-connect",
+        "standardFlowEnabled": true,
+        "implicitFlowEnabled": false,
+        "directAccessGrantsEnabled": false,
+        "serviceAccountsEnabled": false,
+        "authorizationServicesEnabled": false,
+        "redirectUris": [
+          "http://localhost:3000/*",
+          "http://localhost:3000/silent-check-sso.html"
+        ],
         "webOrigins": ["http://localhost:3000"],
-        "directAccessGrantsEnabled": true
+        "attributes": {
+          "pkce.code.challenge.method": "S256",
+          "post.logout.redirect.uris": "http://localhost:3000/*",
+          "access.token.lifespan": "900",
+          "client.session.idle.timeout": "1800",
+          "client.session.max.lifespan": "36000"
+        }
       },
       {
         "clientId": "reports-api",
+        "name": "BionicPRO Reports API",
+        "description": "Backend API для отчетов",
         "enabled": true,
         "clientAuthenticatorType": "client-secret",
         "secret": "oNwoLQdvJAvRcL89SydqCWCe5ry1jMgq", 
-        "bearerOnly": true
+        "bearerOnly": true,
+        "protocol": "openid-connect",
+        "standardFlowEnabled": false,
+        "implicitFlowEnabled": false,
+        "directAccessGrantsEnabled": false,
+        "serviceAccountsEnabled": true
       }
     ]
   }

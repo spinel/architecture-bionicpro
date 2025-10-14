@@ -25,9 +25,16 @@ services:
       KC_DB_URL: jdbc:postgresql://keycloak_db:5432/keycloak_db
       KC_DB_USERNAME: keycloak_user
       KC_DB_PASSWORD: keycloak_password
+
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_ENABLED: true
     command: 
       - start-dev
       - --import-realm
+      - --http-enabled=true
+      - --hostname-strict=false
+      - --hostname-strict-https=false
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
     ports:
@@ -97,6 +104,8 @@ services:
       REACT_APP_KEYCLOAK_URL: http://localhost:8080
       REACT_APP_KEYCLOAK_REALM: reports-realm
       REACT_APP_KEYCLOAK_CLIENT_ID: reports-frontend
+      # Отключаем HTTPS для разработки
+      REACT_APP_SSL_REQUIRED: none
     depends_on:
       - backend
       - keycloak

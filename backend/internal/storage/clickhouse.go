@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"time"
 
@@ -26,9 +25,7 @@ func NewClickHouseStorage(cfg *config.Config) (*ClickHouseStorage, error) {
 			Username: cfg.ClickHouse.User,
 			Password: cfg.ClickHouse.Password,
 		},
-		TLS: &tls.Config{
-			InsecureSkipVerify: true, // Для разработки, в продакшн использовать валидные сертификаты
-		},
+		// Убираем TLS для локальной разработки
 		Settings: clickhouse.Settings{
 			"max_execution_time": 60,
 		},

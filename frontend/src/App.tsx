@@ -19,6 +19,9 @@ const keycloakConfig: KeycloakConfig = {
 // Создание экземпляра Keycloak
 const keycloak = new Keycloak(keycloakConfig);
 
+
+keycloak.sslRequired = 'none';
+
 /**
  * Настройка PKCE для Keycloak
  * 

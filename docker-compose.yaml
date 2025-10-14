@@ -112,6 +112,106 @@ services:
     networks:
       - bionicpro-network
 
+  # PostgreSQL для CRM данных
+  crm_db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: crm_db
+      POSTGRES_USER: crm_user
+      POSTGRES_PASSWORD: crm_password
+    volumes:
+      - ./crm-data:/var/lib/postgresql/data
+      - ./airflow/crm-init:/docker-entrypoint-initdb.d
+    ports:
+      - "5434:5432"
+    networks:
+      - bionicpro-network
+
+  # Redis для Airflow
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    networks:
+      - bionicpro-network
+
+  # Apache Airflow
+  airflow-webserver:
+    image: apache/airflow:2.8.0
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      - AIRFLOW__CORE__FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=true
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session
+      - AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK=true
+      - AIRFLOW__WEBSERVER__SECRET_KEY=airflow-secret-key
+      - _PIP_ADDITIONAL_REQUIREMENTS=apache-airflow-providers-postgres apache-airflow-providers-http
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/config:/opt/airflow/config
+      - ./airflow/init-airflow.sh:/opt/airflow/init-airflow.sh
+    ports:
+      - "8081:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    depends_on:
+      - airflow-db
+      - redis
+      - crm_db
+      - clickhouse
+    networks:
+      - bionicpro-network
+
+  airflow-scheduler:
+    image: apache/airflow:2.8.0
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      - AIRFLOW__CORE__FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=true
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK=true
+      - _PIP_ADDITIONAL_REQUIREMENTS=apache-airflow-providers-postgres apache-airflow-providers-http
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/config:/opt/airflow/config
+    command: scheduler
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - airflow-db
+      - redis
+      - crm_db
+      - clickhouse
+    networks:
+      - bionicpro-network
+
+  airflow-db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: airflow
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+    volumes:
+      - ./airflow-db-data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+    networks:
+      - bionicpro-network
+
 networks:
   bionicpro-network:
     driver: bridge

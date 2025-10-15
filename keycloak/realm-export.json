@@ -132,6 +132,7 @@
           "pkce.code.challenge.method": "S256",
           "post.logout.redirect.uris": "http://localhost:3000/*",
           "access.token.lifespan": "900",
+          "ssl.required": "none",
           "client.session.idle.timeout": "1800",
           "client.session.max.lifespan": "36000"
         }

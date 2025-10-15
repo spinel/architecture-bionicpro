@@ -20,7 +20,7 @@ from airflow.operators.python import PythonOperator
 from airflow.operators.bash import BashOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
-from airflow.providers.clickhouse.hooks.clickhouse import ClickHouseHook
+from airflow.providers.http.hooks.http import HttpHook
 from airflow.utils.dates import days_ago
 import pandas as pd
 import json
@@ -314,7 +314,7 @@ def load_to_clickhouse(**context):
         return {'loaded_records': 0}
     
     # Подключение к ClickHouse
-    clickhouse_hook = ClickHouseHook(clickhouse_conn_id='clickhouse_default')
+    clickhouse_hook = HttpHook(http_conn_id='clickhouse_default', method='POST')
     
     # Подготовка данных для вставки
     records_to_insert = []
@@ -376,7 +376,12 @@ def load_to_clickhouse(**context):
     """
     
     # Выполнение вставки
-    clickhouse_hook.run(insert_sql, records_to_insert)
+    # Отправляем SQL через HTTP интерфейс ClickHouse
+    response = clickhouse_hook.run(
+        endpoint='/',
+        data=insert_sql,
+        headers={'Content-Type': 'text/plain'}
+    )
     
     logging.info(f"Успешно загружено {len(records_to_insert)} записей в ClickHouse")
     
@@ -389,7 +394,7 @@ def validate_data_quality(**context):
     logging.info("Начинаем валидацию качества данных...")
     
     # Подключение к ClickHouse
-    clickhouse_hook = ClickHouseHook(clickhouse_conn_id='clickhouse_default')
+    clickhouse_hook = HttpHook(http_conn_id='clickhouse_default', method='POST')
     
     # Проверки качества данных
     validation_queries = {
@@ -401,7 +406,13 @@ def validate_data_quality(**context):
     
     validation_results = {}
     for check_name, query in validation_queries.items():
-        result = clickhouse_hook.get_first(query)
+        # Выполняем SQL запрос через HTTP интерфейс
+        response = clickhouse_hook.run(
+            endpoint='/',
+            data=query,
+            headers={'Content-Type': 'text/plain'}
+        )
+        result = [int(response.text.strip())] if response.text.strip() else [0]
         validation_results[check_name] = result[0] if result else 0
     
     # Логирование результатов валидации

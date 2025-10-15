@@ -19,6 +19,12 @@ Thumbs.db
 # Database data
 postgres-keycloak-data/
 clickhouse-data/
+airflow-db-data/
+crm-data/
+clickhouse-init/
+keycloak/
+postgres-keycloak-data/
+postgres-keycloak-data/
 
 # Logs
 *.log

@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
-from airflow.providers.clickhouse.hooks.clickhouse import ClickHouseHook
+from airflow.providers.http.hooks.http import HttpHook
 from airflow.utils.dates import days_ago
 import pandas as pd
 import json
@@ -81,7 +81,7 @@ def update_recent_sessions(**context):
         return {'updated_sessions': 0}
     
     # Подключение к ClickHouse
-    clickhouse_hook = ClickHouseHook(clickhouse_conn_id='clickhouse_default')
+    clickhouse_hook = HttpHook(http_conn_id='clickhouse_default', method='POST')
     
     # Обновление ежедневной активности
     daily_updates = []
@@ -96,7 +96,13 @@ def update_recent_sessions(**context):
         AND activity_date = '{activity_date}'
         """
         
-        existing_count = clickhouse_hook.get_first(check_query)[0]
+        # Проверяем существующие записи
+        response = clickhouse_hook.run(
+            endpoint='/',
+            data=check_query,
+            headers={'Content-Type': 'text/plain'}
+        )
+        existing_count = int(response.text.strip()) if response.text.strip() else 0
         
         if existing_count > 0:
             # Обновляем существующую запись
@@ -138,7 +144,12 @@ def update_recent_sessions(**context):
             total_movements, errors_count, battery_cycles
         ) VALUES
         """
-        clickhouse_hook.run(insert_sql, daily_updates)
+        # Выполняем вставку через HTTP интерфейс
+        response = clickhouse_hook.run(
+            endpoint='/',
+            data=insert_sql,
+            headers={'Content-Type': 'text/plain'}
+        )
     
     logging.info(f"Обновлено {len(sessions_df)} сессий")
     return {'updated_sessions': len(sessions_df)}
@@ -175,7 +186,7 @@ def update_recent_events(**context):
         return {'updated_events': 0}
     
     # Подключение к ClickHouse
-    clickhouse_hook = ClickHouseHook(clickhouse_conn_id='clickhouse_default')
+    clickhouse_hook = HttpHook(http_conn_id='clickhouse_default', method='POST')
     
     # Подготовка данных для вставки
     events_to_insert = []
@@ -226,7 +237,12 @@ def update_recent_events(**context):
             event_type, event_category, event_severity, event_description, event_data, resolved
         ) VALUES
         """
-        clickhouse_hook.run(insert_sql, events_to_insert)
+        # Выполняем вставку событий через HTTP интерфейс
+        response = clickhouse_hook.run(
+            endpoint='/',
+            data=insert_sql,
+            headers={'Content-Type': 'text/plain'}
+        )
     
     logging.info(f"Обновлено {len(events_df)} событий")
     return {'updated_events': len(events_df)}
@@ -238,7 +254,7 @@ def check_system_health(**context):
     logging.info("Проверяем здоровье системы...")
     
     # Подключение к ClickHouse
-    clickhouse_hook = ClickHouseHook(clickhouse_conn_id='clickhouse_default')
+    clickhouse_hook = HttpHook(http_conn_id='clickhouse_default', method='POST')
     
     # Проверки здоровья системы
     health_checks = {
@@ -266,7 +282,19 @@ def check_system_health(**context):
     
     alerts = []
     for check_name, query in health_checks.items():
-        results = clickhouse_hook.get_records(query)
+        # Выполняем SQL запрос через HTTP интерфейс
+        response = clickhouse_hook.run(
+            endpoint='/',
+            data=query,
+            headers={'Content-Type': 'text/plain'}
+        )
+        # Парсим результат (предполагаем CSV формат)
+        results = []
+        if response.text.strip():
+            lines = response.text.strip().split('\n')
+            for line in lines:
+                if line.strip():
+                    results.append(line.strip().split('\t'))
         if results:
             alerts.append({
                 'check': check_name,

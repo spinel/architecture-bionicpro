@@ -20,6 +20,7 @@ const keycloakConfig: KeycloakConfig = {
 const keycloak = new Keycloak(keycloakConfig);
 
 
+// @ts-ignore - отключаем SSL для разработки
 keycloak.sslRequired = 'none';
 
 /**

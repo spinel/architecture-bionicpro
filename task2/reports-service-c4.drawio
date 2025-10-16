@@ -1,0 +1,280 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0" version="24.8.4">
+<diagram name="Reports-Service-C4" id="reports-etl-architecture">
+<mxGraphModel dx="1643" dy="926" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1400" math="0" shadow="0">
+<root>
+<mxCell id="0"/>
+<mxCell id="1" parent="0"/>
+
+<!-- System Boundary -->
+<object placeholders="1" c4Name="BionicPRO Reports Service" c4Type="SystemScopeBoundary" c4Application="Reports & Analytics" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;&lt;div style=&quot;text-align: left&quot;&gt;%c4Name%&lt;/div&gt;&lt;/b&gt;&lt;/font&gt;&lt;div style=&quot;text-align: left&quot;&gt;[%c4Application%]&lt;/div&gt;" id="system-boundary">
+<mxCell style="rounded=1;fontSize=11;whiteSpace=wrap;html=1;dashed=1;arcSize=20;fillColor=none;strokeColor=#FF8C00;fontColor=#333333;labelBackgroundColor=none;align=left;verticalAlign=bottom;labelBorderColor=none;spacingTop=0;spacing=10;dashPattern=8 4;strokeWidth=2;" parent="1" vertex="1">
+<mxGeometry x="100" y="100" width="1600" height="1200" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- Users -->
+<object placeholders="1" c4Name="Пилот протеза" c4Type="Person" c4Description="Просматривает отчёты о своём протезе" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="user-pilot">
+<mxCell style="html=1;fontSize=11;dashed=0;whiteSpace=wrap;fillColor=#6C6477;strokeColor=#4D4D4D;fontColor=#ffffff;shape=mxgraph.c4.person2;align=center;" parent="1" vertex="1">
+<mxGeometry x="40" y="400" width="200" height="180" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- Data Sources -->
+<object placeholders="1" c4Name="CRM Database" c4Type="External System" c4Technology="Oracle DB" c4Description="Данные пользователей, заказов, протезов" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="crm-db">
+<mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;" parent="1" vertex="1">
+<mxGeometry x="300" y="1150" width="240" height="120" as="geometry"/>
+</mxCell>
+</object>
+
+<object placeholders="1" c4Name="PostgreSQL" c4Type="External System" c4Technology="PostgreSQL 15" c4Description="Телеметрия протезов, датчики" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="postgresql">
+<mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;" parent="1" vertex="1">
+<mxGeometry x="600" y="1150" width="240" height="120" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- ETL Layer -->
+<object placeholders="1" c4Name="Apache Airflow" c4Type="Container" c4Technology="Python, DAGs" c4Description="Оркестрация ETL процессов, расписание задач" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="airflow">
+<mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#FF8C00;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#CC7000;strokeWidth=2;" parent="1" vertex="1">
+<mxGeometry x="450" y="900" width="300" height="140" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- ETL Components -->
+<object placeholders="1" c4Name="Extract Service" c4Type="Component" c4Technology="Python" c4Description="Извлечение данных из источников" label="&lt;font style=&quot;font-size: 14px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Technology%]&lt;/div&gt;" id="extract-service">
+<mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#FFA500;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#CC7000;" parent="1" vertex="1">
+<mxGeometry x="300" y="920" width="120" height="80" as="geometry"/>
+</mxCell>
+</object>
+
+<object placeholders="1" c4Name="Transform Service" c4Type="Component" c4Technology="Python, Pandas" c4Description="Трансформация и обогащение данных" label="&lt;font style=&quot;font-size: 14px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Technology%]&lt;/div&gt;" id="transform-service">
+<mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#FFA500;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#CC7000;" parent="1" vertex="1">
+<mxGeometry x="460" y="920" width="120" height="80" as="geometry"/>
+</mxCell>
+</object>
+
+<object placeholders="1" c4Name="Load Service" c4Type="Component" c4Technology="Python, ClickHouse Driver" c4Description="Загрузка в ClickHouse" label="&lt;font style=&quot;font-size: 14px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Technology%]&lt;/div&gt;" id="load-service">
+<mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#FFA500;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#CC7000;" parent="1" vertex="1">
+<mxGeometry x="620" y="920" width="120" height="80" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- OLAP Database -->
+<object placeholders="1" c4Name="ClickHouse OLAP" c4Type="Container" c4Technology="ClickHouse 23.8" c4Description="Колоночная OLAP БД для аналитики и отчётов" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="clickhouse">
+<mxCell style="shape=cylinder3;size=15;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#FF8C00;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#CC7000;strokeWidth=2;" parent="1" vertex="1">
+<mxGeometry x="1000" y="900" width="280" height="140" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- ClickHouse Tables -->
+<object placeholders="1" c4Name="fact_telemetry" c4Type="Table" label="&lt;b&gt;%c4Name%&lt;/b&gt;&lt;br&gt;[%c4Type%]" id="table-telemetry">
+<mxCell style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFE4B5;strokeColor=#CC7000;size=10;fontSize=10;" parent="1" vertex="1">
+<mxGeometry x="1020" y="920" width="90" height="40" as="geometry"/>
+</mxCell>
+</object>
+
+<object placeholders="1" c4Name="dim_users" c4Type="Table" label="&lt;b&gt;%c4Name%&lt;/b&gt;&lt;br&gt;[%c4Type%]" id="table-users">
+<mxCell style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFE4B5;strokeColor=#CC7000;size=10;fontSize=10;" parent="1" vertex="1">
+<mxGeometry x="1130" y="920" width="90" height="40" as="geometry"/>
+</mxCell>
+</object>
+
+<object placeholders="1" c4Name="agg_daily_reports" c4Type="Table" label="&lt;b&gt;%c4Name%&lt;/b&gt;&lt;br&gt;[%c4Type%]" id="table-reports">
+<mxCell style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFE4B5;strokeColor=#CC7000;size=10;fontSize=10;" parent="1" vertex="1">
+<mxGeometry x="1020" y="980" width="90" height="40" as="geometry"/>
+</mxCell>
+</object>
+
+<object placeholders="1" c4Name="mv_user_summary" c4Type="Materialized View" label="&lt;b&gt;%c4Name%&lt;/b&gt;&lt;br&gt;[%c4Type%]" id="mv-summary">
+<mxCell style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFE4B5;strokeColor=#CC7000;size=10;fontSize=10;" parent="1" vertex="1">
+<mxGeometry x="1130" y="980" width="90" height="40" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- API Layer -->
+<object placeholders="1" c4Name="Reports API" c4Type="Container" c4Technology="Go, Gin Framework" c4Description="REST API для получения отчётов пользователями" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="reports-api">
+<mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;" parent="1" vertex="1">
+<mxGeometry x="1000" y="650" width="280" height="140" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- API Endpoints -->
+<object placeholders="1" c4Name="GET /daily" label="&lt;b&gt;%c4Name%&lt;/b&gt;" id="endpoint-daily">
+<mxCell style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#E0F7FF;strokeColor=#0E7DAD;size=8;fontSize=10;" parent="1" vertex="1">
+<mxGeometry x="1020" y="670" width="80" height="30" as="geometry"/>
+</mxCell>
+</object>
+
+<object placeholders="1" c4Name="GET /weekly" label="&lt;b&gt;%c4Name%&lt;/b&gt;" id="endpoint-weekly">
+<mxCell style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#E0F7FF;strokeColor=#0E7DAD;size=8;fontSize=10;" parent="1" vertex="1">
+<mxGeometry x="1120" y="670" width="80" height="30" as="geometry"/>
+</mxCell>
+</object>
+
+<object placeholders="1" c4Name="GET /export" label="&lt;b&gt;%c4Name%&lt;/b&gt;" id="endpoint-export">
+<mxCell style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#E0F7FF;strokeColor=#0E7DAD;size=8;fontSize=10;" parent="1" vertex="1">
+<mxGeometry x="1020" y="710" width="80" height="30" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- Cache Layer -->
+<object placeholders="1" c4Name="Redis Cache" c4Type="Container" c4Technology="Redis 7" c4Description="Кэширование отчётов для снижения нагрузки" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="redis">
+<mxCell style="shape=cylinder3;size=15;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;" parent="1" vertex="1">
+<mxGeometry x="1350" y="650" width="200" height="140" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- Frontend -->
+<object placeholders="1" c4Name="Web Application" c4Type="Container" c4Technology="React, TypeScript" c4Description="Веб-интерфейс для просмотра отчётов" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="webapp">
+<mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;" parent="1" vertex="1">
+<mxGeometry x="400" y="400" width="280" height="140" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- Mobile App -->
+<object placeholders="1" c4Name="Mobile App" c4Type="Container" c4Technology="iOS, Android" c4Description="Мобильное приложение для просмотра отчётов" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="mobile-app">
+<mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;" parent="1" vertex="1">
+<mxGeometry x="750" y="400" width="280" height="140" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- Security -->
+<object placeholders="1" c4Name="Auth Service" c4Type="Container" c4Technology="Keycloak + PKCE" c4Description="Аутентификация и авторизация пользователей" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="auth-service">
+<mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#FF6B6B;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#CC0000;" parent="1" vertex="1">
+<mxGeometry x="600" y="200" width="280" height="120" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- Monitoring -->
+<object placeholders="1" c4Name="Airflow Monitoring" c4Type="Container" c4Technology="Airflow UI, Prometheus" c4Description="Мониторинг ETL процессов" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="monitoring">
+<mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#9370DB;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#6A5ACD;" parent="1" vertex="1">
+<mxGeometry x="150" y="900" width="120" height="140" as="geometry"/>
+</mxCell>
+</object>
+
+<!-- Connections -->
+<!-- User to Apps -->
+<mxCell id="edge-user-webapp" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#707070;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" parent="1" source="user-pilot" target="webapp" edge="1">
+<mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="edge-label-1" value="Просмотр отчётов" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-user-webapp">
+<mxGeometry x="-0.1" y="2" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+</mxCell>
+
+<!-- Apps to API -->
+<mxCell id="edge-webapp-api" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#23A2D9;strokeWidth=2;entryX=0;entryY=0.5;" parent="1" source="webapp" target="reports-api" edge="1">
+<mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="edge-label-2" value="GET /api/v1/reports" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#23A2D9;" vertex="1" connectable="0" parent="edge-webapp-api">
+<mxGeometry x="-0.1" y="2" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+</mxCell>
+
+<mxCell id="edge-mobile-api" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#23A2D9;strokeWidth=2;entryX=0;entryY=0.7;" parent="1" source="mobile-app" target="reports-api" edge="1">
+<mxGeometry relative="1" as="geometry"/>
+</mxCell>
+
+<!-- Apps to Auth -->
+<mxCell id="edge-webapp-auth" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF6B6B;strokeWidth=2;dashed=1;entryX=0;entryY=0.5;" parent="1" source="webapp" target="auth-service" edge="1">
+<mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="edge-label-3" value="Аутентификация" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#FF0000;" vertex="1" connectable="0" parent="edge-webapp-auth">
+<mxGeometry x="-0.1" y="2" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+</mxCell>
+
+<mxCell id="edge-mobile-auth" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF6B6B;strokeWidth=2;dashed=1;entryX=1;entryY=0.5;" parent="1" source="mobile-app" target="auth-service" edge="1">
+<mxGeometry relative="1" as="geometry"/>
+</mxCell>
+
+<!-- API to ClickHouse -->
+<mxCell id="edge-api-clickhouse" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF8C00;strokeWidth=2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" parent="1" source="reports-api" target="clickhouse" edge="1">
+<mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="edge-label-4" value="SQL запросы" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#FF8C00;" vertex="1" connectable="0" parent="edge-api-clickhouse">
+<mxGeometry x="-0.1" y="2" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+</mxCell>
+
+<!-- API to Cache -->
+<mxCell id="edge-api-redis" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#23A2D9;strokeWidth=2;dashed=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" parent="1" source="reports-api" target="redis" edge="1">
+<mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="edge-label-5" value="Кэширование" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#23A2D9;" vertex="1" connectable="0" parent="edge-api-redis">
+<mxGeometry x="-0.1" y="2" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+</mxCell>
+
+<!-- ETL: Sources to Airflow -->
+<mxCell id="edge-crm-extract" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#8C8496;strokeWidth=2;exitX=0.5;exitY=0;entryX=0;entryY=1;" parent="1" source="crm-db" target="extract-service" edge="1">
+<mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="edge-label-6" value="Extract" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#8C8496;" vertex="1" connectable="0" parent="edge-crm-extract">
+<mxGeometry x="-0.1" y="2" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+</mxCell>
+
+<mxCell id="edge-pg-extract" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#8C8496;strokeWidth=2;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" parent="1" source="postgresql" target="extract-service" edge="1">
+<mxGeometry relative="1" as="geometry"/>
+</mxCell>
+
+<!-- ETL: Extract -> Transform -> Load -->
+<mxCell id="edge-extract-transform" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FFA500;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" parent="1" source="extract-service" target="transform-service" edge="1">
+<mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="edge-label-7" value="Raw Data" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#FFA500;" vertex="1" connectable="0" parent="edge-extract-transform">
+<mxGeometry x="-0.1" y="2" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+</mxCell>
+
+<mxCell id="edge-transform-load" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FFA500;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" parent="1" source="transform-service" target="load-service" edge="1">
+<mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="edge-label-8" value="Transformed" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#FFA500;" vertex="1" connectable="0" parent="edge-transform-load">
+<mxGeometry x="-0.1" y="2" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+</mxCell>
+
+<!-- ETL: Load to ClickHouse -->
+<mxCell id="edge-load-clickhouse" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF8C00;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" parent="1" source="load-service" target="clickhouse" edge="1">
+<mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="edge-label-9" value="INSERT" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#FF8C00;" vertex="1" connectable="0" parent="edge-load-clickhouse">
+<mxGeometry x="-0.1" y="2" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+</mxCell>
+
+<!-- Monitoring to Airflow -->
+<mxCell id="edge-monitoring-airflow" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9370DB;strokeWidth=2;dashed=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" parent="1" source="monitoring" target="airflow" edge="1">
+<mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="edge-label-10" value="Мониторинг DAGs" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#9370DB;" vertex="1" connectable="0" parent="edge-monitoring-airflow">
+<mxGeometry x="-0.1" y="2" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+</mxCell>
+
+<!-- Legend -->
+<mxCell id="legend-title" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;Легенда:&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+<mxGeometry x="1400" y="1050" width="100" height="30" as="geometry"/>
+</mxCell>
+
+<mxCell id="legend-etl" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF8C00;strokeColor=#CC7000;" parent="1" vertex="1">
+<mxGeometry x="1400" y="1090" width="30" height="20" as="geometry"/>
+</mxCell>
+<mxCell id="legend-etl-text" value="ETL Components" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+<mxGeometry x="1440" y="1085" width="150" height="30" as="geometry"/>
+</mxCell>
+
+<mxCell id="legend-api" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#23A2D9;strokeColor=#0E7DAD;" parent="1" vertex="1">
+<mxGeometry x="1400" y="1120" width="30" height="20" as="geometry"/>
+</mxCell>
+<mxCell id="legend-api-text" value="API & Applications" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+<mxGeometry x="1440" y="1115" width="150" height="30" as="geometry"/>
+</mxCell>
+
+<mxCell id="legend-external" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#8C8496;strokeColor=#736782;" parent="1" vertex="1">
+<mxGeometry x="1400" y="1150" width="30" height="20" as="geometry"/>
+</mxCell>
+<mxCell id="legend-external-text" value="External Systems" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+<mxGeometry x="1440" y="1145" width="150" height="30" as="geometry"/>
+</mxCell>
+
+<!-- Notes -->
+<mxCell id="note-etl" value="&lt;b&gt;ETL Процесс:&lt;/b&gt;&lt;br&gt;1. Extract: Извлечение из CRM и PostgreSQL&lt;br&gt;2. Transform: Очистка, обогащение, агрегация&lt;br&gt;3. Load: Загрузка в ClickHouse&lt;br&gt;&lt;br&gt;&lt;b&gt;Расписание:&lt;/b&gt;&lt;br&gt;• Hourly: каждый час&lt;br&gt;• Daily: 02:00 AM&lt;br&gt;• Weekly: Sunday 03:00 AM" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFF9E6;strokeColor=#FF8C00;size=15;fontSize=11;align=left;" parent="1" vertex="1">
+<mxGeometry x="150" y="1150" width="280" height="120" as="geometry"/>
+</mxCell>
+
+</root>
+</mxGraphModel>
+</diagram>
+</mxfile>

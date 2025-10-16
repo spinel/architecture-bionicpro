@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Environment variables
+.env
+backend/.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database data
+postgres-keycloak-data/
+clickhouse-data/
+airflow-db-data/
+crm-data/
+clickhouse-init/
+keycloak/
+postgres-keycloak-data/
+postgres-keycloak-data/
+
+# Logs
+*.log
+
+# Go
+backend/main
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Build artifacts
+dist/
+build/

@@ -1,0 +1,34 @@
+{
+  "connections": [
+    {
+      "conn_id": "crm_postgres",
+      "conn_type": "postgres",
+      "host": "crm_db",
+      "schema": "crm_db",
+      "login": "crm_user",
+      "password": "crm_password",
+      "port": 5432,
+      "description": "PostgreSQL connection for CRM data"
+    },
+    {
+      "conn_id": "clickhouse_default",
+      "conn_type": "clickhouse",
+      "host": "clickhouse",
+      "schema": "reports_db",
+      "login": "default",
+      "password": "",
+      "port": 9000,
+      "description": "ClickHouse connection for OLAP data warehouse"
+    },
+    {
+      "conn_id": "airflow_postgres",
+      "conn_type": "postgres",
+      "host": "airflow-db",
+      "schema": "airflow",
+      "login": "airflow",
+      "password": "airflow",
+      "port": 5432,
+      "description": "PostgreSQL connection for Airflow metadata"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Silent SSO Check</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <script>
+        // Silent SSO check iframe
+        // Используется Keycloak для проверки активной сессии без перенаправления пользователя
+        parent.postMessage(location.href, location.origin);
+    </script>
+</body>
+</html>
+

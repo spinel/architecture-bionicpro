@@ -1,0 +1,58 @@
+{
+  "users": [
+    {
+      "username": "prothetic1",
+      "email": "prothetic1@bionicpro.com",
+      "firstName": "Иван",
+      "lastName": "Петров",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["prothetic_user"],
+      "clientRoles": {
+        "reports-frontend": ["prothetic_user"]
+      }
+    },
+    {
+      "username": "user1",
+      "email": "user1@bionicpro.com",
+      "firstName": "Мария",
+      "lastName": "Сидорова",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["regular_user"],
+      "clientRoles": {
+        "reports-frontend": ["regular_user"]
+      }
+    },
+    {
+      "username": "admin",
+      "email": "admin@bionicpro.com",
+      "firstName": "Администратор",
+      "lastName": "Системы",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["admin"],
+      "clientRoles": {
+        "reports-frontend": ["admin"]
+      }
+    }
+  ]
+}

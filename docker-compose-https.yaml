@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # PostgreSQL для приложения
+  app_db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: bionicpro
+      POSTGRES_USER: bionicpro_user
+      POSTGRES_PASSWORD: bionicpro_password
+    volumes:
+      - ./backend/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  # PostgreSQL для Keycloak
+  keycloak_db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: keycloak_db
+      POSTGRES_USER: keycloak_user
+      POSTGRES_PASSWORD: keycloak_password
+    ports:
+      - "5433:5432"
+
+  # Keycloak для аутентификации
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak_db:5432/keycloak_db
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: keycloak_password
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_ENABLED: true
+      KC_PROXY: edge
+    command: 
+      - start-dev
+      - --import-realm
+      - --hostname-strict=false
+      - --hostname-strict-https=false
+      - --http-enabled=true
+      - --proxy=edge
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak_db
+
+  # Backend API
+  backend:
+    build: ./backend
+    environment:
+      DB_HOST: app_db
+      DB_PORT: 5432
+      DB_NAME: bionicpro
+      DB_USER: bionicpro_user
+      DB_PASSWORD: bionicpro_password
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_REALM: reports-realm
+      KEYCLOAK_CLIENT_ID: reports-api
+      KEYCLOAK_CLIENT_SECRET: oNwoLQdvJAvRcL89SydqCWCe5ry1jMgq
+      JWT_SECRET: your-secret-key-here
+    ports:
+      - "8000:8080"
+    depends_on:
+      - app_db
+      - keycloak
+
+  # Frontend
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  # Nginx Reverse Proxy с SSL
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx-https.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl_certs:/etc/nginx/ssl:ro
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8443:8443"
+    depends_on:
+      - frontend
+      - backend
+      - keycloak

@@ -1,0 +1,16 @@
+airflow/logs/
+airflow/dags/
+airflow/plugins/
+airflow/logs/
+airflow/dags/
+airflow/plugins/
+airflow/logs/
+airflow/dags/
+airflow/plugins/
+airflow/logs/
+airflow/dags/
+airflow/plugins/
+clickhouse-data/
+airflow_db_data/
+postgres-airflow-data/
+airflow/logs/

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BionicPRO UI Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        select, input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔬 BionicPRO UI Integration Test</h1>
+    
+    <div class="container">
+        <h2>📊 Тест API интеграции</h2>
+        <p>Этот тест проверяет интеграцию UI с API для получения аналитических отчётов.</p>
+        
+        <div>
+            <label>Пользователь:</label>
+            <select id="userId">
+                <option value="user_001">user_001</option>
+                <option value="user_002">user_002</option>
+                <option value="user_003">user_003</option>
+            </select>
+            
+            <label>Начальная дата:</label>
+            <input type="date" id="startDate" value="2025-10-17">
+            
+            <label>Конечная дата:</label>
+            <input type="date" id="endDate" value="2025-10-18">
+        </div>
+        
+        <div>
+            <button class="button" onclick="testHealth()">Проверить здоровье API</button>
+            <button class="button" onclick="testReports()">Получить отчёты</button>
+            <button class="button" onclick="testSummary()">Получить сводку</button>
+            <button class="button" onclick="testAccessControl()">Тест контроля доступа</button>
+        </div>
+        
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Результаты тестирования</h2>
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let testResults = [];
+
+        function showResult(message, isError = false) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = `result ${isError ? 'error' : 'success'}`;
+            resultDiv.textContent = message;
+        }
+
+        function addTestResult(testName, success, message) {
+            testResults.push({ testName, success, message });
+            updateTestResults();
+        }
+
+        function updateTestResults() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = testResults.map(result => `
+                <div class="result ${result.success ? 'success' : 'error'}">
+                    <strong>${result.testName}:</strong> ${result.success ? '✅' : '❌'} ${result.message}
+                </div>
+            `).join('');
+        }
+
+        async function testHealth() {
+            try {
+                showResult('Проверка здоровья API...');
+                const response = await fetch(`${API_BASE}/api/v1/health`);
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'healthy') {
+                    showResult(`✅ API здоров: ${JSON.stringify(data, null, 2)}`);
+                    addTestResult('Health Check', true, 'API отвечает корректно');
+                } else {
+                    throw new Error(`API нездоров: ${data.status}`);
+                }
+            } catch (error) {
+                showResult(`❌ Ошибка проверки здоровья: ${error.message}`, true);
+                addTestResult('Health Check', false, error.message);
+            }
+        }
+
+        async function testReports() {
+            try {
+                const userId = document.getElementById('userId').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                
+                showResult('Получение отчётов...');
+                
+                const response = await fetch(`${API_BASE}/api/v1/demo/reports?user_id=${userId}&start_date=${startDate}&end_date=${endDate}`, {
+                    headers: {
+                        'X-User-ID': userId,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult(`✅ Отчёты получены: ${data.data.length} записей\n${JSON.stringify(data, null, 2)}`);
+                    addTestResult('Get Reports', true, `Получено ${data.data.length} отчётов`);
+                } else {
+                    throw new Error(data.error || 'Неизвестная ошибка');
+                }
+            } catch (error) {
+                showResult(`❌ Ошибка получения отчётов: ${error.message}`, true);
+                addTestResult('Get Reports', false, error.message);
+            }
+        }
+
+        async function testSummary() {
+            try {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                
+                showResult('Получение сводки...');
+                
+                const response = await fetch(`${API_BASE}/api/v1/analytics/summary?start_date=${startDate}&end_date=${endDate}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(`✅ Сводка получена: ${data.length} записей\n${JSON.stringify(data, null, 2)}`);
+                    addTestResult('Get Summary', true, `Получено ${data.length} записей сводки`);
+                } else {
+                    throw new Error('Ошибка получения сводки');
+                }
+            } catch (error) {
+                showResult(`❌ Ошибка получения сводки: ${error.message}`, true);
+                addTestResult('Get Summary', false, error.message);
+            }
+        }
+
+        async function testAccessControl() {
+            try {
+                showResult('Тестирование контроля доступа...');
+                
+                // Тест 1: Доступ к собственным данным
+                const userId = document.getElementById('userId').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                
+                const ownDataResponse = await fetch(`${API_BASE}/api/v1/demo/reports?user_id=${userId}&start_date=${startDate}&end_date=${endDate}`, {
+                    headers: {
+                        'X-User-ID': userId,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!ownDataResponse.ok) {
+                    throw new Error('Не удалось получить собственные данные');
+                }
+                
+                // Тест 2: Попытка доступа к чужим данным
+                const otherUserId = userId === 'user_001' ? 'user_002' : 'user_001';
+                const otherDataResponse = await fetch(`${API_BASE}/api/v1/demo/reports?user_id=${otherUserId}&start_date=${startDate}&end_date=${endDate}`, {
+                    headers: {
+                        'X-User-ID': userId, // Текущий пользователь пытается получить данные другого
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (otherDataResponse.ok) {
+                    throw new Error('Контроль доступа не работает - получен доступ к чужим данным');
+                }
+                
+                const otherData = await otherDataResponse.json();
+                if (!otherData.error || !otherData.error.includes('запрещён')) {
+                    throw new Error('Неправильное сообщение об ошибке доступа');
+                }
+                
+                showResult(`✅ Контроль доступа работает:\n- Собственные данные: доступ разрешён\n- Чужие данные: доступ запрещён (${otherData.error})`);
+                addTestResult('Access Control', true, 'Контроль доступа работает корректно');
+                
+            } catch (error) {
+                showResult(`❌ Ошибка тестирования контроля доступа: ${error.message}`, true);
+                addTestResult('Access Control', false, error.message);
+            }
+        }
+
+        // Автоматический запуск тестов при загрузке
+        window.onload = function() {
+            setTimeout(() => {
+                testHealth();
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

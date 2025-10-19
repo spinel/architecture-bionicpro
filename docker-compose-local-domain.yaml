@@ -1,0 +1,193 @@
+version: '3.8'
+
+services:
+  # Keycloak Identity Provider
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak_db:5432/keycloak_db
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: keycloak_password
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_ENABLED: true
+      KC_PROXY: edge
+    command: 
+      - start-dev
+      - --import-realm
+      - --hostname-strict=false
+      - --hostname-strict-https=false
+      - --http-enabled=true
+      - --proxy=edge
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./ssl_certs_local/bionicpro.local.crt:/opt/keycloak/conf/server.crt.pem
+      - ./ssl_certs_local/bionicpro.local.key:/opt/keycloak/conf/server.key.pem
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak_db
+
+  # Nginx Reverse Proxy с SSL для локального домена
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx-local-domain.conf:/etc/nginx/nginx.conf
+      - ./ssl_certs_local:/etc/nginx/ssl
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - frontend
+      - backend
+      - keycloak
+
+  # Основная база данных приложения
+  app_db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: bionicpro
+      POSTGRES_USER: bionicpro_user
+      POSTGRES_PASSWORD: bionicpro_password
+    ports:
+      - "5434:5432"
+    volumes:
+      - app_db_data:/var/lib/postgresql/data
+
+  # База данных Keycloak
+  keycloak_db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: keycloak_db
+      POSTGRES_USER: keycloak_user
+      POSTGRES_PASSWORD: keycloak_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - keycloak_db_data:/var/lib/postgresql/data
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: app_db
+      DB_PORT: 5432
+      DB_NAME: bionicpro
+      DB_USER: bionicpro_user
+      DB_PASSWORD: bionicpro_password
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      KEYCLOAK_URL: https://keycloak.bionicpro.local
+      KEYCLOAK_REALM: reports-realm
+      KEYCLOAK_CLIENT_ID: reports-backend
+      KEYCLOAK_CLIENT_SECRET: your-client-secret
+    ports:
+      - "8000:8080"
+    depends_on:
+      - app_db
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_KEYCLOAK_URL: https://keycloak.bionicpro.local
+      REACT_APP_KEYCLOAK_REALM: reports-realm
+      REACT_APP_KEYCLOAK_CLIENT_ID: reports-frontend
+
+  # ClickHouse для аналитики
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    environment:
+      CLICKHOUSE_DB: bionicpro_analytics
+      CLICKHOUSE_USER: analytics_user
+      CLICKHOUSE_PASSWORD: analytics_password
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+
+  # Redis для кэширования
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+
+  # Airflow Database
+  airflow_db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: airflow
+      POSTGRES_USER: airflow_user
+      POSTGRES_PASSWORD: airflow_password
+    ports:
+      - "5435:5432"
+    volumes:
+      - airflow_db_data:/var/lib/postgresql/data
+
+  # CRM Service (Mock)
+  crm_service:
+    image: nginx:alpine
+    ports:
+      - "8001:80"
+
+  # Airflow Webserver
+  airflow-webserver:
+    image: apache/airflow:2.7.0
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow_user:airflow_password@airflow_db:5432/airflow
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: 'True'
+      AIRFLOW__WEBSERVER__SECRET_KEY: your-secret-key
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/airflow.cfg:/opt/airflow/airflow.cfg
+    ports:
+      - "8081:8080"
+    depends_on:
+      - airflow_db
+    command: >
+      bash -c "
+        airflow db init &&
+        airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin &&
+        python /opt/airflow/dags/init_connections.py &&
+        airflow webserver
+      "
+
+  # Airflow Scheduler
+  airflow-scheduler:
+    image: apache/airflow:2.7.0
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow_user:airflow_password@airflow_db:5432/airflow
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/airflow.cfg:/opt/airflow/airflow.cfg
+    depends_on:
+      - airflow_db
+    command: >
+      bash -c "
+        airflow db init &&
+        airflow scheduler
+      "
+
+volumes:
+  app_db_data:
+  keycloak_db_data:
+  clickhouse_data:
+  redis_data:
+  airflow_db_data:
